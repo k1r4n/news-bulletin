@@ -4,7 +4,6 @@ import "time"
 
 // ArticleList structure
 type ArticleList struct {
-	Status   string `json:"status"`
 	Source   string `json:"source"`
 	SortBy   string `json:"sortBy"`
 	Articles []struct {
@@ -32,4 +31,9 @@ type MediaList struct {
 		Large  string `json:"large"`
 	} `json:"urlsToLogos"`
 	SortBysAvailable []string `json:"sortBysAvailable"`
+}
+
+// MediaListResponse structure
+type MediaListResponse struct {
+	Sources []MediaList `json:"sources"`
 }
