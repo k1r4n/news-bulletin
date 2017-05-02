@@ -30,6 +30,7 @@ func NewsAPIInstant(c *conf.Vars, l *logrus.Logger, m models.MediaListResponse, 
 
 //FetchMediaList fetches list of medias from newsapi.org
 func (n NewsAPI) FetchMediaList() ([]models.MediaList, []models.MediaList, error) {
+	fmt.Println("Getting MediaList \n ")
 	url := n.conf.ChannelEndPoint
 	mediaList := n.mediaList
 	mediaTopList := n.mediaTopList
@@ -52,9 +53,11 @@ func (n NewsAPI) FetchMediaList() ([]models.MediaList, []models.MediaList, error
 	for i := 0; i < len(mediaList.Sources); i++ {
 		for j := 0; j < len(mediaList.Sources[i].SortBysAvailable); j++ {
 			if mediaList.Sources[i].SortBysAvailable[j] == "top" {
+				fmt.Println("Creating top channel list array\n ")
 				mediaTopList = append(mediaTopList, mediaList.Sources[i])
 			}
 			if mediaList.Sources[i].SortBysAvailable[j] == "latest" {
+				fmt.Println("Creating latest channel list array\n ")
 				mediaLatestList = append(mediaLatestList, mediaList.Sources[i])
 			}
 		}
@@ -63,13 +66,14 @@ func (n NewsAPI) FetchMediaList() ([]models.MediaList, []models.MediaList, error
 }
 
 // FetchArticleList fetchs all articles from newsapi.org
-func (n NewsAPI) FetchArticleList() ([]models.ArticleList, []models.ArticleList, error) {
+func (n NewsAPI) FetchArticleList(mediaTopList []models.MediaList, mediaLatestList []models.MediaList) ([]models.ArticleList, []models.ArticleList, error) {
+	fmt.Println("Getting articles \n ")
 	articleList := n.articleList
 	articleTopList := n.articleTopList
-	fmt.Println(articleTopList)
 	articleLatestList := n.articleLatestList
-	for i := 0; i < len(n.mediaTopList); i++ {
-		url := n.conf.ArticleEndPoint + "?source=" + n.mediaTopList[i].ID + "&sortBy=top&apiKey=" + n.conf.APIKey
+	for i := 0; i < len(mediaTopList); i++ {
+		fmt.Println("Getting top articles \n ")
+		url := n.conf.ArticleEndPoint + "?source=" + mediaTopList[i].ID + "&sortBy=top&apiKey=" + n.conf.APIKey
 		resp, err := http.Get(url)
 		if err != nil {
 			n.log.Error(err)
@@ -87,8 +91,9 @@ func (n NewsAPI) FetchArticleList() ([]models.ArticleList, []models.ArticleList,
 		err = json.Unmarshal(body, &articleList)
 		articleTopList = append(articleTopList, articleList)
 	}
-	for i := 0; i < len(n.mediaLatestList); i++ {
-		url := n.conf.ArticleEndPoint + "?source=" + n.mediaLatestList[i].ID + "&sortBy=latest&apiKey=" + n.conf.APIKey
+	for i := 0; i < len(mediaLatestList); i++ {
+		fmt.Println("Getting latest articles \n ")
+		url := n.conf.ArticleEndPoint + "?source=" + mediaLatestList[i].ID + "&sortBy=latest&apiKey=" + n.conf.APIKey
 		resp, err := http.Get(url)
 		if err != nil {
 			n.log.Error(err)

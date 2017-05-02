@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/news-bulletin-cron/conf"
@@ -38,8 +37,17 @@ func init() {
 func main() {
 	conf := conf.Read()
 	newsAPI := services.NewsAPIInstant(conf, errorLog, mediaList, mediaTopList, mediaLatestList, articleList, articleTopList, articleLatestList)
+	mediaTopList, mediaLatestList, err := newsAPI.FetchMediaList()
+	if err != nil {
+		panic(err)
+	}
+	articleTopList, articleLatestList, err = newsAPI.FetchArticleList(mediaTopList, mediaLatestList)
+	if err != nil {
+		panic(err)
+	}
 	elastic := services.NewElasticInstant(ctx, conf, errorLog, elasticClient, articleTopList, articleLatestList, mediaTopList, mediaLatestList)
-	if 0 == 1 {
-		fmt.Println(newsAPI, elastic)
+	err = elastic.UpdateDatabase()
+	if err != nil {
+		panic(err)
 	}
 }
