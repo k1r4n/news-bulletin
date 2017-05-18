@@ -36,8 +36,8 @@ func init() {
 
 func main() {
 	conf := conf.Read()
-	newsAPI := services.NewsAPIInstant(conf, errorLog, mediaList, mediaTopList, mediaLatestList, articleList, articleTopList, articleLatestList)
-	mediaTopList, mediaLatestList, err := newsAPI.FetchMediaList()
+	newsAPI := services.NewsAPIInstant(conf, errorLog)
+	mediaTopList, mediaLatestList, err = newsAPI.FetchMediaList()
 	if err != nil {
 		panic(err)
 	}
